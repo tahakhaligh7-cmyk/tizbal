@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>تیزبال | دستیار هوشمند</title>
+
+<style>
+
+/* ==================================================
+   تنظیمات اصلی
+================================================== */
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+
+    --bg:#eef1f5;
+    --panel:#ffffff;
+    --text:#172033;
+    --muted:#6b7280;
+    --border:#d8dde5;
+    --primary:#172033;
+    --primaryText:#ffffff;
+    --user:#e8ebef;
+    --bot:#172033;
+    --danger:#c62828;
+    --input:#ffffff;
+}
+
+body.dark{
+
+    --bg:#10141c;
+    --panel:#181e29;
+    --text:#f3f4f6;
+    --muted:#aab1bd;
+    --border:#303846;
+    --primary:#f3f4f6;
+    --primaryText:#111827;
+    --user:#293140;
+    --bot:#252d3b;
+    --input:#202734;
+}
+
+
+/* ==================================================
+   بدنه
+================================================== */
+
+body{
+
+    margin:0;
+
+    font-family:
+        Tahoma,
+        Arial,
+        sans-serif;
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    height:100vh;
+
+    transition:
+        background .25s,
+        color .25s;
+}
+
+
+/* ==================================================
+   برنامه
+================================================== */
+
+.app{
+
+    width:96%;
+
+    max-width:1000px;
+
+    height:94vh;
+
+    margin:3vh auto;
+
+    background:var(--panel);
+
+    border-radius:22px;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.14);
+}
+
+
+/* ==================================================
+   هدر
+================================================== */
+
+header{
+
+    padding:17px 20px;
+
+    background:var(--primary);
+
+    color:var(--primaryText);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+header h1{
+
+    margin:0;
+
+    font-size:25px;
+}
+
+header small{
+
+    opacity:.7;
+}
+
+
+/* ==================================================
+   نوار ابزار
+================================================== */
+
+.toolbar{
+
+    display:flex;
+
+    gap:7px;
+
+    flex-wrap:wrap;
+
+    padding:9px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.tool{
+
+    border:1px solid var(--border);
+
+    background:var(--panel);
+
+    color:var(--text);
+
+    border-radius:10px;
+
+    padding:8px 11px;
+
+    cursor:pointer;
+
+    font-family:inherit;
+
+    font-size:13px;
+}
+
+.tool:hover{
+
+    opacity:.75;
+}
+
+
+/* ==================================================
+   چت
+================================================== */
+
+#chat{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:20px;
+}
+
+
+/* پیام */
+
+.message{
+
+    margin:13px 0;
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+.message.user{
+
+    align-items:flex-start;
+}
+
+.message.bot{
+
+    align-items:flex-end;
+}
+
+
+/* نام */
+
+.name{
+
+    font-size:11px;
+
+    color:var(--muted);
+
+    margin-bottom:5px;
+}
+
+
+/* حباب */
+
+.bubble{
+
+    max-width:82%;
+
+    padding:13px 16px;
+
+    border-radius:17px;
+
+    line-height:1.9;
+
+    white-space:pre-wrap;
+
+    overflow-wrap:anywhere;
+}
+
+.user .bubble{
+
+    background:var(--user);
+
+    color:var(--text);
+}
+
+.bot .bubble{
+
+    background:var(--bot);
+
+    color:#fff;
+}
+
+
+/* ==================================================
+   پایین
+================================================== */
+
+.bottom{
+
+    padding:12px;
+
+    border-top:
+        1px solid var(--border);
+}
+
+
+/* ورودی */
+
+textarea{
+
+    width:100%;
+
+    height:58px;
+
+    resize:none;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:13px;
+
+    background:var(--input);
+
+    color:var(--text);
+
+    font-family:inherit;
+
+    font-size:15px;
+
+    outline:none;
+}
+
+textarea:focus{
+
+    border-color:
+        var(--primary);
+}
+
+
+/* کنترل */
+
+.controls{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-top:8px;
+}
+
+button{
+
+    border:0;
+
+    border-radius:12px;
+
+    padding:11px 17px;
+
+    cursor:pointer;
+
+    font-family:inherit;
+}
+
+#send{
+
+    flex:1;
+
+    background:var(--primary);
+
+    color:var(--primaryText);
+}
+
+#clear{
+
+    background:#e5e7eb;
+
+    color:#222;
+}
+
+
+/* ==================================================
+   پنجره ابزار
+================================================== */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+        rgba(0,0,0,.55);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:10;
+
+    padding:20px;
+}
+
+.modal.show{
+
+    display:flex;
+}
+
+.modalBox{
+
+    width:100%;
+
+    max-width:500px;
+
+    max-height:85vh;
+
+    overflow:auto;
+
+    background:var(--panel);
+
+    color:var(--text);
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.3);
+}
+
+.modalBox h2{
+
+    margin-top:0;
+}
+
+.close{
+
+    background:#e5e7eb;
+
+    color:#222;
+
+    width:100%;
+
+    margin-top:10px;
+}
+
+
+/* ماشین حساب */
+
+.calc{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:7px;
+}
+
+.calc input{
+
+    grid-column:
+        1 / -1;
+
+    height:55px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:10px;
+
+    padding:10px;
+
+    background:var(--input);
+
+    color:var(--text);
+
+    font-size:20px;
+
+    direction:ltr;
+}
+
+.calc button{
+
+    min-height:48px;
+
+    background:var(--user);
+
+    color:var(--text);
+
+    font-size:16px;
+}
+
+
+/* یادداشت */
+
+.noteInput{
+
+    width:100%;
+
+    padding:12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:10px;
+
+    background:var(--input);
+
+    color:var(--text);
+
+    font-family:inherit;
+}
+
+.noteButton{
+
+    width:100%;
+
+    margin-top:8px;
+
+    background:var(--primary);
+
+    color:var(--primaryText);
+}
+
+.note{
+
+    margin-top:10px;
+
+    padding:10px;
+
+    background:var(--user);
+
+    border-radius:10px;
+
+    line-height:1.8;
+}
+
+
+/* ==================================================
+   موبایل
+================================================== */
+
+@media(max-width:600px){
+
+    .app{
+
+        width:100%;
+
+        height:100vh;
+
+        margin:0;
+
+        border-radius:0;
+    }
+
+    .bubble{
+
+        max-width:91%;
+    }
+
+    header h1{
+
+        font-size:21px;
+    }
+
+    .toolbar{
+
+        overflow-x:auto;
+
+        flex-wrap:nowrap;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- ==================================================
+     هدر
+================================================== -->
+
+<header>
+
+    <div>
+
+        <h1>🧠 تیزبال</h1>
+
+        <small>
+            دستیار هوشمند مستقل
+        </small>
+
+    </div>
+
+    <small id="status">
+        آماده
+    </small>
+
+</header>
+
+
+<!-- ==================================================
+     ابزارها
+================================================== -->
+
+<div class="toolbar">
+
+    <button
+        class="tool"
+        onclick="openCalculator()">
+        🧮 ماشین حساب
+    </button>
+
+    <button
+        class="tool"
+        onclick="openNotes()">
+        📝 یادداشت
+    </button>
+
+    <button
+        class="tool"
+        onclick="showMemory()">
+        🧠 حافظه
+    </button>
+
+    <button
+        class="tool"
+        onclick="toggleTheme()">
+        🌓 حالت
+    </button>
+
+    <button
+        class="tool"
+        onclick="showStats()">
+        📊 آمار
+    </button>
+
+</div>
+
+
+<!-- ==================================================
+     چت
+================================================== -->
+
+<div id="chat"></div>
+
+
+<!-- ==================================================
+     پایین
+================================================== -->
+
+<div class="bottom">
+
+    <textarea
+        id="input"
+        placeholder="مثلاً: سلام، اسم من علی است"
+    ></textarea>
+
+    <div class="controls">
+
+        <button
+            id="send"
+            onclick="sendMessage()">
+            ارسال
+        </button>
+
+        <button
+            id="clear"
+            onclick="clearChat()">
+            پاک کردن
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- ==================================================
+     پنجره ماشین حساب
+================================================== -->
+
+<div
+    id="calculatorModal"
+    class="modal">
+
+    <div class="modalBox">
+
+        <h2>
+            🧮 ماشین حساب
+        </h2>
+
+        <div class="calc">
+
+            <input
+                id="calcDisplay"
+                readonly>
+
+            <button onclick="calcPress('7')">
+                7
+            </button>
+
+            <button onclick="calcPress('8')">
+                8
+            </button>
+
+            <button onclick="calcPress('9')">
+                9
+            </button>
+
+            <button onclick="calcPress('/')">
+                ÷
+            </button>
+
+            <button onclick="calcPress('4')">
+                4
+            </button>
+
+            <button onclick="calcPress('5')">
+                5
+            </button>
+
+            <button onclick="calcPress('6')">
+                6
+            </button>
+
+            <button onclick="calcPress('*')">
+                ×
+            </button>
+
+            <button onclick="calcPress('1')">
+                1
+            </button>
+
+            <button onclick="calcPress('2')">
+                2
+            </button>
+
+            <button onclick="calcPress('3')">
+                3
+            </button>
+
+            <button onclick="calcPress('-')">
+                −
+            </button>
+
+            <button onclick="calcPress('0')">
+                0
+            </button>
+
+            <button onclick="calcPress('.')">
+                .
+            </button>
+
+            <button onclick="calcResult()">
+                =
+            </button>
+
+            <button onclick="calcPress('+')">
+                +
+            </button>
+
+            <button onclick="calcSquare()">
+                x²
+            </button>
+
+            <button onclick="calcSqrt()">
+                √
+            </button>
+
+            <button onclick="calcPercent()">
+                %
+            </button>
+
+            <button onclick="calcClear()">
+                C
+            </button>
+
+        </div>
+
+        <button
+            class="close"
+            onclick="closeModal('calculatorModal')">
+            بستن
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     پنجره یادداشت
+================================================== -->
+
+<div
+    id="notesModal"
+    class="modal">
+
+    <div class="modalBox">
+
+        <h2>
+            📝 یادداشت‌ها
+        </h2>
+
+        <input
+            id="noteInput"
+            class="noteInput"
+            placeholder="یادداشت جدید...">
+
+        <button
+            class="noteButton"
+            onclick="addNote()">
+            ذخیره یادداشت
+        </button>
+
+        <div id="notesList"></div>
+
+        <button
+            class="close"
+            onclick="closeModal('notesModal')">
+            بستن
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   تیزبال
+   نسخه مستقل
+   فقط JavaScript خام
+===================================================== */
+
+
+/* =====================================================
+   حافظه
+===================================================== */
+
+let memory =
+JSON.parse(
+    localStorage.getItem("tizbal_memory")
+) || {
+
+    name:"",
+
+    likes:[],
+
+    facts:[]
+
+};
+
+
+/* =====================================================
+   تاریخچه
+===================================================== */
+
+let history =
+JSON.parse(
+    localStorage.getItem("tizbal_history")
+) || [];
+
+
+/* =====================================================
+   یادداشت‌ها
+===================================================== */
+
+let notes =
+JSON.parse(
+    localStorage.getItem("tizbal_notes")
+) || [];
+
+
+/* =====================================================
+   شمارنده
+===================================================== */
+
+let stats =
+JSON.parse(
+    localStorage.getItem("tizbal_stats")
+) || {
+
+    messages:0,
+
+    userMessages:0,
+
+    botMessages:0
+
+};
+
+
+/* =====================================================
+   عناصر
+===================================================== */
+
+const chat =
+document.getElementById("chat");
+
+const input =
+document.getElementById("input");
+
+
+/* =====================================================
+   ذخیره همه اطلاعات
+===================================================== */
+
+function saveData(){
+
+    localStorage.setItem(
+        "tizbal_memory",
+        JSON.stringify(memory)
+    );
+
+    localStorage.setItem(
+        "tizbal_history",
+        JSON.stringify(history)
+    );
+
+    localStorage.setItem(
+        "tizbal_notes",
+        JSON.stringify(notes)
+    );
+
+    localStorage.setItem(
+        "tizbal_stats",
+        JSON.stringify(stats)
+    );
+
+}
+
+
+/* =====================================================
+   نمایش پیام
+===================================================== */
+
+function showMessage(type,text){
+
+    const box =
+    document.createElement("div");
+
+    box.className =
+    "message " + type;
+
+
+    const name =
+    document.createElement("div");
+
+    name.className =
+    "name";
+
+    name.textContent =
+    type === "user"
+    ? "شما"
+    : "تیزبال";
+
+
+    const bubble =
+    document.createElement("div");
+
+    bubble.className =
+    "bubble";
+
+    bubble.textContent =
+    text;
+
+
+    box.appendChild(name);
+
+    box.appendChild(bubble);
+
+    chat.appendChild(box);
+
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+}
+
+
+/* =====================================================
+   تشخیص نام
+===================================================== */
+
+function findName(text){
+
+    const patterns = [
+
+        /اسم من (.+?) است/i,
+
+        /نام من (.+?) است/i,
+
+        /من (.+?) هستم/i,
+
+        /منو (.+?) صدا کن/i
+
+    ];
+
+
+    for(
+        const pattern
+        of patterns
+    ){
+
+        const match =
+        text.match(pattern);
+
+
+        if(match){
+
+            const name =
+            match[1].trim();
+
+
+            if(
+                name.length > 0 &&
+                name.length < 40
+            ){
+
+                memory.name =
+                name;
+
+                saveData();
+
+                return name;
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   تشخیص علاقه
+===================================================== */
+
+function findLike(text){
+
+    const match =
+    text.match(
+        /من (.+?) دوست دارم/
+    );
+
+
+    if(match){
+
+        const thing =
+        match[1].trim();
+
+
+        if(
+            thing &&
+            !memory.likes.includes(thing)
+        ){
+
+            memory.likes.push(
+                thing
+            );
+
+            saveData();
+
+            return thing;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   سلام
+===================================================== */
+
+function greeting(){
+
+    if(memory.name){
+
+        return (
+            "سلام " +
+            memory.name +
+            " 👋\n" +
+            "خوش اومدی."
+        );
+
+    }
+
+
+    return (
+        "سلام 👋\n" +
+        "من تیزبال هستم. " +
+        "چه کمکی از دستم برمیاد؟"
+    );
+
+}
+
+
+/* =====================================================
+   حافظه
+===================================================== */
+
+function memoryAnswer(){
+
+    let text =
+    "🧠 چیزهایی که به خاطر دارم:\n\n";
+
+    let found = false;
+
+
+    if(memory.name){
+
+        text +=
+        "👤 نام: " +
+        memory.name +
+        "\n";
+
+        found = true;
+
+    }
+
+
+    if(memory.likes.length){
+
+        text +=
+        "❤️ علاقه‌ها: " +
+        memory.likes.join("، ") +
+        "\n";
+
+        found = true;
+
+    }
+
+
+    if(memory.facts.length){
+
+        text +=
+        "📌 اطلاعات:\n";
+
+        memory.facts.forEach(
+            function(item){
+
+                text +=
+                "• " +
+                item +
+                "\n";
+
+            }
+        );
+
+        found = true;
+
+    }
+
+
+    if(!found){
+
+        text +=
+        "هنوز اطلاعاتی از تو ذخیره نکرده‌ام.";
+
+    }
+
+
+    return text;
+
+}
+
+
+/* =====================================================
+   تبدیل اعداد فارسی
+===================================================== */
+
+function normalizeNumbers(text){
+
+    const fa =
+    "۰۱۲۳۴۵۶۷۸۹";
+
+    const ar =
+    "٠١٢٣٤٥٦٧٨٩";
+
+
+    for(let i=0;i<10;i++){
+
+        text =
+        text.split(fa[i])
+        .join(String(i));
+
+        text =
+        text.split(ar[i])
+        .join(String(i));
+
+    }
+
+
+    return text;
+
+}
+
+
+/* =====================================================
+   ماشین حساب متنی
+===================================================== */
+
+function calculateExpression(expression){
+
+    expression =
+    normalizeNumbers(expression);
+
+
+    expression =
+    expression
+    .replace(/×/g,"*")
+    .replace(/÷/g,"/")
+    .replace(/٪/g,"%");
+
+
+    if(
+        !/^[0-9+\-*/().%\s]+$/.test(expression)
+    ){
+
+        return null;
+
+    }
+
+
+    try{
+
+        /*
+          این بخش فقط برای عبارت‌های عددی است.
+        */
+
+        const result =
+        Function(
+            '"use strict"; return (' +
+            expression +
+            ')'
+        )();
+
+
+        if(
+            typeof result === "number" &&
+            Number.isFinite(result)
+        ){
+
+            return result;
+
+        }
+
+    }
+    catch(e){
+
+        return null;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   تشخیص محاسبه
+===================================================== */
+
+function tryMath(text){
+
+    let clean =
+    normalizeNumbers(text)
+    .trim();
+
+
+    clean =
+    clean
+    .replace(
+        /^حساب کن\s*/i,
+        ""
+    )
+    .replace(
+        /^محاسبه کن\s*/i,
+        ""
+    )
+    .replace(
+        /^جواب\s*/i,
+        ""
+    );
+
+
+    const result =
+    calculateExpression(clean);
+
+
+    if(result !== null){
+
+        return (
+            "🧮 جواب: " +
+            result
+        );
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   تبدیل واحد
+===================================================== */
+
+function convertUnit(text){
+
+    let match;
+
+
+    match =
+    text.match(
+        /(\d+(?:\.\d+)?)\s*(کیلومتر|km)\s*(?:به|در)\s*(متر|m)/i
+    );
+
+    if(match){
+
+        const value =
+        Number(match[1]) * 1000;
+
+        return (
+            value +
+            " متر"
+        );
+
+    }
+
+
+    match =
+    text.match(
+        /(\d+(?:\.\d+)?)\s*(متر|m)\s*(?:به|در)\s*(کیلومتر|km)/i
+    );
+
+    if(match){
+
+        const value =
+        Number(match[1]) / 1000;
+
+        return (
+            value +
+            " کیلومتر"
+        );
+
+    }
+
+
+    match =
+    text.match(
+        /(\d+(?:\.\d+)?)\s*(کیلو|کیلوگرم|kg)\s*(?:به|در)\s*(گرم|g)/i
+    );
+
+    if(match){
+
+        const value =
+        Number(match[1]) * 1000;
+
+        return (
+            value +
+            " گرم"
+        );
+
+    }
+
+
+    match =
+    text.match(
+        /(\d+(?:\.\d+)?)\s*(گرم|g)\s*(?:به|در)\s*(کیلو|کیلوگرم|kg)/i
+    );
+
+    if(match){
+
+        const value =
+        Number(match[1]) / 1000;
+
+        return (
+            value +
+            " کیلوگرم"
+        );
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   پاسخ اصلی تیزبال
+===================================================== */
+
+function think(text){
+
+    const t =
+    text
+    .trim()
+    .toLowerCase();
+
+
+    /* نام */
+
+    const name =
+    findName(text);
+
+
+    if(name){
+
+        return (
+            "باشه " +
+            name +
+            " 👍\n" +
+            "اسمت رو به خاطر سپردم."
+        );
+
+    }
+
+
+    /* علاقه */
+
+    const like =
+    findLike(text);
+
+
+    if(like){
+
+        return (
+            "متوجه شدم ❤️\n" +
+            like +
+            " رو دوست داری."
+        );
+
+    }
+
+
+    /* سلام */
+
+    if(
+        t.includes("سلام") ||
+        t.includes("درود") ||
+        t === "hi" ||
+        t === "hello"
+    ){
+
+        return greeting();
+
+    }
+
+
+    /* معرفی */
+
+    if(
+        t.includes("تو کی هستی") ||
+        t.includes("خودتو معرفی") ||
+        t.includes("اسمت چیه")
+    ){
+
+        return (
+            "من تیزبال هستم 🧠\n\n" +
+            "یک دستیار مستقل هستم که " +
+            "با HTML، CSS و JavaScript ساخته شده‌ام.\n\n" +
+            "به هیچ سرویس هوش مصنوعی خارجی " +
+            "برای اجرای این نسخه متصل نیستم."
+        );
+
+    }
+
+
+    /* اسم */
+
+    if(
+        t.includes("اسم من چیه") ||
+        t.includes("نام من چیه") ||
+        t.includes("من کی هستم")
+    ){
+
+        if(memory.name){
+
+            return (
+                "اسمت " +
+                memory.name +
+                " است. 🙂"
+            );
+
+        }
+
+        return (
+            "هنوز اسمت رو بهم نگفتی."
+        );
+
+    }
+
+
+    /* حافظه */
+
+    if(
+        t.includes("حافظه") ||
+        t.includes("چی یادت") ||
+        t.includes("چه چیزهایی یادت")
+    ){
+
+        return memoryAnswer();
+
+    }
+
+
+    /* پاک کردن حافظه */
+
+    if(
+        t.includes("حافظه رو پاک کن") ||
+        t.includes("همه چیز رو فراموش کن")
+    ){
+
+        memory = {
+
+            name:"",
+
+            likes:[],
+
+            facts:[]
+
+        };
+
+        saveData();
+
+        return (
+            "حافظه پاک شد. 🧹"
+        );
+
+    }
+
+
+    /* کمک */
+
+    if(
+        t.includes("کمک") ||
+        t.includes("چه کارهایی میتونی") ||
+        t.includes("چیکار میتونی")
+    ){
+
+        return (
+            "من می‌تونم این کارها رو انجام بدم:\n\n" +
+            "🧠 حافظه\n" +
+            "🧮 محاسبه\n" +
+            "📅 تاریخ و ساعت\n" +
+            "🔄 تبدیل واحد\n" +
+            "📝 یادداشت\n" +
+            "📊 آمار گفت‌وگو\n" +
+            "🌓 حالت تاریک و روشن\n\n" +
+            "و می‌تونیم قابلیت‌های بیشتری هم به من اضافه کنیم."
+        );
+
+    }
+
+
+    /* ساعت */
+
+    if(
+        t.includes("ساعت چنده") ||
+        t.includes("ساعت چند")
+    ){
+
+        return (
+            "⏰ ساعت الان:\n" +
+            new Date().toLocaleTimeString(
+                "fa-IR"
+            )
+        );
+
+    }
+
+
+    /* تاریخ */
+
+    if(
+        t.includes("امروز چندمه") ||
+        t.includes("تاریخ امروز")
+    ){
+
+        return (
+            "📅 تاریخ امروز:\n" +
+            new Date().toLocaleDateString(
+                "fa-IR"
+            )
+        );
+
+    }
+
+
+    /* محاسبه */
+
+    const math =
+    tryMath(text);
+
+
+    if(math){
+
+        return math;
+
+    }
+
+
+    /* تبدیل واحد */
+
+    const unit =
+    convertUnit(text);
+
+
+    if(unit){
+
+        return (
+            "🔄 نتیجه:\n" +
+            unit
+        );
+
+    }
+
+
+    /* تشکر */
+
+    if(
+        t.includes("ممنون") ||
+        t.includes("مرسی") ||
+        t.includes("متشکرم")
+    ){
+
+        return (
+            "خواهش می‌کنم 😊"
+        );
+
+    }
+
+
+    /* خداحافظی */
+
+    if(
+        t.includes("خداحافظ") ||
+        t.includes("فعلا") ||
+        t.includes("خدانگهدار")
+    ){
+
+        return (
+            "خداحافظ 👋\n" +
+            "هر وقت خواستی برگرد."
+        );
+
+    }
+
+
+    /* سؤال درباره توانایی */
+
+    if(
+        t.includes("بلدی") ||
+        t.includes("میتونی")
+    ){
+
+        return (
+            "اگر منظورت یکی از قابلیت‌های فعلی من است، " +
+            "بگو دقیقاً چه کاری می‌خواهی انجام بدهم."
+        );
+
+    }
+
+
+    /* پاسخ پیش‌فرض */
+
+    return (
+        "سؤالت رو دریافت کردم. 🤖\n\n" +
+        "در این نسخه، دانش من بر اساس " +
+        "قوانین و قابلیت‌هایی است که خودمان در کد تیزبال نوشته‌ایم.\n\n" +
+        "اگر این موضوع هنوز در قابلیت‌های من نباشد، " +
+        "می‌توانیم آن قابلیت را به کد اضافه کنیم."
+    );
+
+}
+
+
+/* =====================================================
+   ارسال پیام
+===================================================== */
+
+function sendMessage(){
+
+    const text =
+    input.value.trim();
+
+
+    if(!text)
+        return;
+
+
+    showMessage(
+        "user",
+        text
+    );
+
+
+    stats.messages++;
+
+    stats.userMessages++;
+
+
+    history.push({
+
+        role:"user",
+
+        text:text,
+
+        time:
+        new Date().toISOString()
+
+    });
+
+
+    const answer =
+    think(text);
+
+
+    setTimeout(
+        function(){
+
+            showMessage(
+                "bot",
+                answer
+            );
+
+
+            stats.messages++;
+
+            stats.botMessages++;
+
+
+            history.push({
+
+                role:"bot",
+
+                text:answer,
+
+                time:
+                new Date().toISOString()
+
+            });
+
+
+            saveData();
+
+        },
+        250
+    );
+
+
+    input.value="";
+
+    input.focus();
+
+}
+
+
+/* =====================================================
+   Enter
+===================================================== */
+
+input.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key === "Enter" &&
+            !event.shiftKey
+        ){
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   پاک کردن چت
+===================================================== */
+
+function clearChat(){
+
+    chat.innerHTML="";
+
+    history=[];
+
+    saveData();
+
+
+    showMessage(
+        "bot",
+        "گفت‌وگو پاک شد. 🧹\nسلام! من تیزبال هستم."
+    );
+
+}
+
+
+/* =====================================================
+   ماشین حساب
+===================================================== */
+
+function openCalculator(){
+
+    document
+    .getElementById(
+        "calculatorModal"
+    )
+    .classList.add("show");
+
+}
+
+
+function calcPress(value){
+
+    const display =
+    document.getElementById(
+        "calcDisplay"
+    );
+
+    display.value += value;
+
+}
+
+
+function calcClear(){
+
+    document
+    .getElementById(
+        "calcDisplay"
+    )
+    .value="";
+
+}
+
+
+function calcResult(){
+
+    const display =
+    document.getElementById(
+        "calcDisplay"
+    );
+
+
+    const result =
+    calculateExpression(
+        display.value
+    );
+
+
+    if(result === null){
+
+        display.value =
+        "خطا";
+
+    }
+    else{
+
+        display.value =
+        result;
+
+    }
+
+}
+
+
+function calcSquare(){
+
+    const display =
+    document.getElementById(
+        "calcDisplay"
+    );
+
+
+    const number =
+    Number(display.value);
+
+
+    if(
+        Number.isFinite(number)
+    ){
+
+        display.value =
+        number * number;
+
+    }
+
+}
+
+
+function calcSqrt(){
+
+    const display =
+    document.getElementById(
+        "calcDisplay"
+    );
+
+
+    const number =
+    Number(display.value);
+
+
+    if(
+        Number.isFinite(number) &&
+        number >= 0
+    ){
+
+        display.value =
+        Math.sqrt(number);
+
+    }
+
+}
+
+
+function calcPercent(){
+
+    const display =
+    document.getElementById(
+        "calcDisplay"
+    );
+
+
+    const number =
+    Number(display.value);
+
+
+    if(
+        Number.isFinite(number)
+    ){
+
+        display.value =
+        number / 100;
+
+    }
+
+}
+
+
+/* =====================================================
+   یادداشت
+===================================================== */
+
+function openNotes(){
+
+    document
+    .getElementById(
+        "notesModal"
+    )
+    .classList.add("show");
+
+    renderNotes();
+
+}
+
+
+function addNote(){
+
+    const input =
+    document.getElementById(
+        "noteInput"
+    );
+
+
+    const text =
+    input.value.trim();
+
+
+    if(!text)
+        return;
+
+
+    notes.push({
+
+        text:text,
+
+        time:
+        new Date().toLocaleString(
+            "fa-IR"
+        )
+
+    });
+
+
+    saveData();
+
+    input.value="";
+
+    renderNotes();
+
+}
+
+
+function renderNotes(){
+
+    const list =
+    document.getElementById(
+        "notesList"
+    );
+
+
+    list.innerHTML="";
+
+
+    if(notes.length === 0){
+
+        list.innerHTML =
+        "<p>هنوز یادداشتی نداری.</p>";
+
+        return;
+
+    }
+
+
+    notes
+    .slice()
+    .reverse()
+    .forEach(
+        function(note,index){
+
+            const div =
+            document.createElement(
+                "div"
+            );
+
+            div.className =
+            "note";
+
+            div.textContent =
+            "📝 " +
+            note.text +
+            "\n" +
+            "⏱ " +
+            note.time;
+
+
+            const button =
+            document.createElement(
+                "button"
+            );
+
+            button.textContent =
+            "حذف";
+
+
+            button.style.marginTop =
+            "8px";
+
+
+            button.onclick =
+            function(){
+
+                const realIndex =
+                notes.length -
+                1 -
+                index;
+
+
+                notes.splice(
+                    realIndex,
+                    1
+                );
+
+
+                saveData();
+
+                renderNotes();
+
+            };
+
+
+            div.appendChild(
+                document.createElement("br")
+            );
+
+            div.appendChild(
+                button
+            );
+
+
+            list.appendChild(div);
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   حافظه
+===================================================== */
+
+function showMemory(){
+
+    showMessage(
+        "bot",
+        memoryAnswer()
+    );
+
+}
+
+
+/* =====================================================
+   آمار
+===================================================== */
+
+function showStats(){
+
+    const text =
+    "📊 آمار تیزبال:\n\n" +
+
+    "تعداد کل پیام‌ها: " +
+    stats.messages +
+    "\n" +
+
+    "پیام‌های شما: " +
+    stats.userMessages +
+    "\n" +
+
+    "پاسخ‌های تیزبال: " +
+    stats.botMessages +
+    "\n" +
+
+    "تعداد یادداشت‌ها: " +
+    notes.length;
+
+
+    showMessage(
+        "bot",
+        text
+    );
+
+}
+
+
+/* =====================================================
+   حالت تاریک
+===================================================== */
+
+function toggleTheme(){
+
+    document
+    .body
+    .classList
+    .toggle("dark");
+
+
+    const dark =
+    document
+    .body
+    .classList
+    .contains("dark");
+
+
+    localStorage.setItem(
+        "tizbal_theme",
+        dark
+        ? "dark"
+        : "light"
+    );
+
+}
+
+
+/* =====================================================
+   بستن پنجره
+===================================================== */
+
+function closeModal(id){
+
+    document
+    .getElementById(id)
+    .classList
+    .remove("show");
+
+}
+
+
+/* =====================================================
+   بازیابی حالت تاریک
+===================================================== */
+
+if(
+    localStorage.getItem(
+        "tizbal_theme"
+    ) === "dark"
+){
+
+    document
+    .body
+    .classList
+    .add("dark");
+
+}
+
+
+/* =====================================================
+   نمایش تاریخچه
+===================================================== */
+
+if(history.length > 0){
+
+    history.forEach(
+        function(item){
+
+            if(
+                item.role === "user"
+            ){
+
+                showMessage(
+                    "user",
+                    item.text
+                );
+
+            }
+
+            else{
+
+                showMessage(
+                    "bot",
+                    item.text
+                );
+
+            }
+
+        }
+    );
+
+}
+else{
+
+    showMessage(
+        "bot",
+        "سلام 👋\nمن تیزبال هستم.\n\n" +
+        "می‌توانی مثلاً بگویی:\n" +
+        "«اسم من علی است»\n" +
+        "یا بنویسی:\n" +
+        "«25 × 4»"
+    );
+
+}
+
+
+/* =====================================================
+   آماده
+===================================================== */
+
+document
+.getElementById("status")
+.textContent =
+"آماده ✓";
+
+
+input.focus();
+
+</script>
+
+</body>
+</html>
+
