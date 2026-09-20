@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تیزبال</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#08090b;color:#eee;font-family:Tahoma,Arial,sans-serif;height:100vh;overflow:hidden}
+.app{height:100vh;display:flex;gap:12px;padding:12px}.sidebar{width:280px;background:#121419;border:1px solid #252831;border-radius:18px;padding:18px;display:flex;flex-direction:column}
+.logo{font-size:27px;font-weight:800;margin-bottom:18px}button{font:inherit}.new{border:0;border-radius:12px;padding:13px;background:#292d36;color:#fff;cursor:pointer}
+.history{margin-top:16px;overflow:auto}.history div{padding:10px;border-radius:10px;color:#bbb;cursor:pointer;margin-bottom:4px}.history div:hover{background:#20242c}
+.main{flex:1;min-width:0;background:#0e1014;border:1px solid #252831;border-radius:18px;display:flex;flex-direction:column}
+.top{padding:18px 22px;border-bottom:1px solid #252831;font-size:21px;font-weight:700}.messages{flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;padding:13px 16px;border-radius:16px;line-height:1.9;white-space:pre-wrap;word-break:break-word}.user{align-self:flex-start;background:#29303a}.bot{align-self:flex-end;background:#171b21}
+.empty{margin:auto;text-align:center;color:#777;font-size:18px}.tools{display:flex;gap:7px;padding:0 14px 10px;flex-wrap:wrap}
+.tool{border:1px solid #30343d;background:#17191e;color:#ccc;border-radius:10px;padding:7px 10px;cursor:pointer}
+.composer{padding:14px;border-top:1px solid #252831;display:flex;gap:10px}#input{flex:1;resize:none;height:52px;border:1px solid #30343d;border-radius:15px;background:#17191e;color:#fff;padding:13px 15px;outline:none;font:inherit}
+#send{width:58px;height:52px;border:0;border-radius:15px;background:#fff;color:#08090b;font-size:23px;cursor:pointer;font-weight:bold}#send:hover{background:#ddd}
+.card{background:#171b21;border:1px solid #2a3038;border-radius:14px;padding:12px;margin-top:8px}.card b{color:#fff}.small{color:#aaa;font-size:13px}
+@media(max-width:700px){.sidebar{display:none}.app{padding:0}.main{border-radius:0}}
+</style></head>
+<body><div class="app">
+<aside class="sidebar"><div class="logo">⚡ تیزبال</div><button class="new" id="newChat">＋ گفتگوی جدید</button><div class="history" id="history"></div></aside>
+<main class="main"><div class="top">تیزبال</div><div class="messages" id="messages"><div class="empty" id="empty">سلام 👋<br>اسم یک خودرو را بگو؛ مثلاً «پژو پارس»</div></div>
+<div class="tools"><button class="tool" id="hello">👋 سلام</button><button class="tool" id="general">💡 سؤال عمومی</button><button class="tool" id="cars">🚗 جستجوی خودرو</button><button class="tool" id="calc">🧮 ماشین حساب</button><button class="tool" id="time">🕐 ساعت</button><button class="tool" id="clear">🗑 پاک کردن</button></div>
+<div class="composer"><textarea id="input" placeholder="پیامت را بنویس..."></textarea><button id="send" type="button">➤</button></div></main></div>
+<script>
+"use strict";
+const CAR_DB=[{"name": "پژو پارس", "country": "ایران", "engine": "1.8 XU7 / 1.6 TU5 / XU7P", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "پژو 405", "country": "ایران", "engine": "1.8 XU7 / 1.6", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "سمند LX", "country": "ایران", "engine": "1.8 XU7", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "سمند EF7", "country": "ایران", "engine": "1.7 EF7", "fuel": "بنزینی/دوگانه‌سوز", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "دنا", "country": "ایران", "engine": "1.7 EF7", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "دنا پلاس", "country": "ایران", "engine": "1.7 EF7", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "دنا پلاس توربو", "country": "ایران", "engine": "1.65 EF7-TC", "fuel": "بنزینی توربو", "gearbox": "6 سرعته دستی / اتوماتیک در برخی نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "تارا", "country": "ایران", "engine": "1.6 TU5P", "fuel": "بنزینی", "gearbox": "6 سرعته دستی / اتوماتیک", "drive": "دیفرانسیل جلو"}, {"name": "رانا", "country": "ایران", "engine": "1.6 TU5", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "رانا پلاس", "country": "ایران", "engine": "1.6 TU5 / TU5P", "fuel": "بنزینی", "gearbox": "5 یا 6 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "شاهین", "country": "ایران", "engine": "1.5 M15T", "fuel": "بنزینی توربو", "gearbox": "5 سرعته دستی / CVT در برخی نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "کوییک", "country": "ایران", "engine": "1.5 M15", "fuel": "بنزینی", "gearbox": "5 سرعته دستی / CVT در برخی نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "ساینا", "country": "ایران", "engine": "1.5 M15", "fuel": "بنزینی", "gearbox": "5 سرعته دستی / CVT در برخی نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "پراید 131", "country": "ایران", "engine": "1.3", "fuel": "بنزینی", "gearbox": "5 سرعته دستی", "drive": "دیفرانسیل جلو"}, {"name": "پژو 206", "country": "ایران/فرانسه", "engine": "1.4 / 1.6 TU5", "fuel": "بنزینی", "gearbox": "5 سرعته دستی / 4 سرعته اتوماتیک در برخی نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "پژو 207", "country": "ایران", "engine": "1.6 TU5 / TU5P", "fuel": "بنزینی", "gearbox": "5 یا 6 سرعته دستی / اتوماتیک", "drive": "دیفرانسیل جلو"}, {"name": "مزدا 3", "country": "ژاپن", "engine": "2.0 / 2.0 Skyactiv-G در نسل‌های مختلف", "fuel": "بنزینی", "gearbox": "اتوماتیک در بسیاری از نسخه‌ها", "drive": "دیفرانسیل جلو"}, {"name": "Toyota Corolla", "country": "ژاپن", "engine": "1.5 / 1.6 / 1.8 / 2.0 در نسل‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "CVT / دستی بسته به نسل", "drive": "جلو"}, {"name": "Toyota Camry", "country": "ژاپن", "engine": "2.0 / 2.5 / 3.5 در نسل‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "اتوماتیک / e-CVT بسته به نسل", "drive": "جلو"}, {"name": "Toyota Yaris", "country": "ژاپن", "engine": "1.3 / 1.5 / 1.5 Hybrid در نسل‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "CVT / اتوماتیک / دستی بسته به نسل", "drive": "جلو"}, {"name": "Toyota Land Cruiser", "country": "ژاپن", "engine": "2.8 دیزل / 4.0 / 5.7 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل", "gearbox": "اتوماتیک/دستی بسته به نسل", "drive": "چهارچرخ محرک"}, {"name": "Lexus ES", "country": "ژاپن", "engine": "2.5 / 3.5 / هیبرید بسته به نسل", "fuel": "بنزینی/هیبرید", "gearbox": "اتوماتیک/e-CVT", "drive": "جلو"}, {"name": "Nissan Sunny", "country": "ژاپن", "engine": "1.5 / 1.6 بسته به بازار", "fuel": "بنزینی", "gearbox": "دستی/CVT", "drive": "جلو"}, {"name": "Nissan Patrol", "country": "ژاپن", "engine": "4.0 V6 / 5.6 V8 در نسل‌های جدید", "fuel": "بنزینی", "gearbox": "اتوماتیک", "drive": "چهارچرخ محرک"}, {"name": "Honda Civic", "country": "ژاپن", "engine": "1.5 توربو / 2.0 و نسخه‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "CVT/اتوماتیک/دستی بسته به نسل", "drive": "جلو"}, {"name": "Honda Accord", "country": "ژاپن", "engine": "1.5 توربو / 2.0 هیبرید و نسخه‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "CVT/e-CVT", "drive": "جلو"}, {"name": "Mazda 6", "country": "ژاپن", "engine": "2.0 / 2.5", "fuel": "بنزینی", "gearbox": "اتوماتیک/دستی بسته به بازار", "drive": "جلو"}, {"name": "Subaru Forester", "country": "ژاپن", "engine": "2.0 / 2.5 Boxer در نسل‌های مختلف", "fuel": "بنزینی", "gearbox": "CVT", "drive": "چهارچرخ محرک"}, {"name": "Hyundai Elantra", "country": "کره جنوبی", "engine": "1.6 / 2.0 / 1.6 Hybrid بسته به نسل", "fuel": "بنزینی/هیبرید", "gearbox": "دستی/اتوماتیک/CVT بسته به نسل", "drive": "جلو"}, {"name": "Hyundai Sonata", "country": "کره جنوبی", "engine": "2.0 / 2.4 / 1.6T و نسخه‌های مختلف", "fuel": "بنزینی/هیبرید", "gearbox": "اتوماتیک", "drive": "جلو"}, {"name": "Hyundai Tucson", "country": "کره جنوبی", "engine": "2.0 / 1.6T / هیبرید بسته به نسل", "fuel": "بنزینی/هیبرید", "gearbox": "اتوماتیک", "drive": "جلو/چهارچرخ محرک"}, {"name": "Kia Cerato", "country": "کره جنوبی", "engine": "1.6 / 2.0 بسته به نسل", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک/CVT بسته به نسل", "drive": "جلو"}, {"name": "Kia Sportage", "country": "کره جنوبی", "engine": "2.0 / 1.6T / هیبرید بسته به نسل", "fuel": "بنزینی/هیبرید", "gearbox": "اتوماتیک", "drive": "جلو/چهارچرخ محرک"}, {"name": "Genesis G80", "country": "کره جنوبی", "engine": "2.5T / 3.5T بسته به نسل", "fuel": "بنزینی", "gearbox": "8 سرعته اتوماتیک در نسل جدید", "drive": "جلو/چهارچرخ محرک"}, {"name": "Volkswagen Golf", "country": "آلمان", "engine": "1.0 / 1.2 / 1.4 / 1.5 TSI و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "دستی/DSG بسته به نسخه", "drive": "جلو/4MOTION در برخی نسخه‌ها"}, {"name": "Volkswagen Passat", "country": "آلمان", "engine": "1.4 / 1.5 / 2.0 TSI و TDI بسته به نسل", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "دستی/DSG", "drive": "جلو/چهارچرخ محرک در برخی نسخه‌ها"}, {"name": "BMW 3 Series", "country": "آلمان", "engine": "2.0 چهارسیلندر / 3.0 شش‌سیلندر و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "عقب/چهارچرخ محرک"}, {"name": "BMW 5 Series", "country": "آلمان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "عقب/چهارچرخ محرک"}, {"name": "BMW X3", "country": "آلمان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "عقب/چهارچرخ محرک"}, {"name": "Mercedes-Benz C-Class", "country": "آلمان", "engine": "1.5 / 2.0 / 3.0 بسته به نسل", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "عقب/چهارچرخ محرک"}, {"name": "Mercedes-Benz E-Class", "country": "آلمان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "عقب/چهارچرخ محرک"}, {"name": "Mercedes-Benz GLE", "country": "آلمان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "چهارچرخ محرک"}, {"name": "Audi A4", "country": "آلمان", "engine": "1.4 / 1.8 / 2.0 TFSI و نسخه‌های مختلف", "fuel": "بنزینی/دیزل", "gearbox": "دستی/S tronic بسته به نسل", "drive": "جلو/چهارچرخ محرک"}, {"name": "Audi Q5", "country": "آلمان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "S tronic/Tiptronic بسته به نسل", "drive": "چهارچرخ محرک"}, {"name": "Porsche 911", "country": "آلمان", "engine": "3.0 توربو و نسخه‌های مختلف", "fuel": "بنزینی", "gearbox": "PDK/دستی بسته به نسخه", "drive": "عقب/چهارچرخ محرک"}, {"name": "Ford Mustang", "country": "آمریکا", "engine": "2.3 EcoBoost / 5.0 V8 بسته به نسل", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک", "drive": "عقب"}, {"name": "Chevrolet Camaro", "country": "آمریکا", "engine": "2.0T / 3.6 V6 / 6.2 V8 بسته به نسل", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک", "drive": "عقب"}, {"name": "Dodge Challenger", "country": "آمریکا", "engine": "3.6 V6 / 5.7 / 6.4 / 6.2 Supercharged بسته به نسخه", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک", "drive": "عقب/چهارچرخ محرک در برخی نسخه‌ها"}, {"name": "Tesla Model 3", "country": "آمریکا", "engine": "موتور برقی، نسخه‌های مختلف", "fuel": "برقی", "gearbox": "تک‌سرعته", "drive": "عقب/دو موتوره"}, {"name": "Renault Logan", "country": "فرانسه", "engine": "1.6 و نسخه‌های مختلف", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک بسته به بازار", "drive": "جلو"}, {"name": "Renault Duster", "country": "فرانسه", "engine": "1.6 / 2.0 و نسخه‌های مختلف", "fuel": "بنزینی", "gearbox": "دستی/اتوماتیک/CVT بسته به بازار", "drive": "جلو/چهارچرخ محرک"}, {"name": "Peugeot 508", "country": "فرانسه", "engine": "1.6 / 2.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "جلو/چهارچرخ محرک در برخی نسخه‌ها"}, {"name": "Citroen C3", "country": "فرانسه", "engine": "1.2 PureTech و نسخه‌های مختلف", "fuel": "بنزینی/دیزل", "gearbox": "دستی/اتوماتیک", "drive": "جلو"}, {"name": "Fiat 500", "country": "ایتالیا", "engine": "1.2 / 0.9 TwinAir / برقی بسته به نسل", "fuel": "بنزینی/برقی", "gearbox": "دستی/اتوماتیک", "drive": "جلو"}, {"name": "Ferrari 488", "country": "ایتالیا", "engine": "3.9 V8 Twin-Turbo", "fuel": "بنزینی", "gearbox": "7 سرعته دوکلاچه", "drive": "عقب"}, {"name": "Lamborghini Huracan", "country": "ایتالیا", "engine": "5.2 V10", "fuel": "بنزینی", "gearbox": "7 سرعته دوکلاچه", "drive": "عقب/چهارچرخ محرک بسته به نسخه"}, {"name": "Range Rover", "country": "انگلستان", "engine": "3.0 / 4.4 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "چهارچرخ محرک"}, {"name": "Land Rover Defender", "country": "انگلستان", "engine": "2.0 / 3.0 و نسخه‌های مختلف", "fuel": "بنزینی/دیزل/هیبرید", "gearbox": "اتوماتیک", "drive": "چهارچرخ محرک"}, {"name": "Bentley Continental GT", "country": "انگلستان", "engine": "4.0 V8 / 6.0 W12 بسته به نسل", "fuel": "بنزینی", "gearbox": "اتوماتیک دوکلاچه/8 سرعته بسته به نسخه", "drive": "چهارچرخ محرک"}, {"name": "Rolls-Royce Ghost", "country": "انگلستان", "engine": "6.75 V12 Twin-Turbo", "fuel": "بنزینی", "gearbox": "8 سرعته اتوماتیک", "drive": "چهارچرخ محرک"}, {"name": "Chery Tiggo 7", "country": "چین", "engine": "1.5T و نسخه‌های مختلف", "fuel": "بنزینی", "gearbox": "CVT/DCT بسته به نسخه", "drive": "جلو"}, {"name": "Chery Tiggo 8", "country": "چین", "engine": "1.5T / 1.6T / 2.0T بسته به نسخه", "fuel": "بنزینی/هیبرید در برخی بازارها", "gearbox": "DCT/اتوماتیک", "drive": "جلو/چهارچرخ محرک"}, {"name": "BYD Song Plus", "country": "چین", "engine": "هیبرید پلاگین/برقی بسته به نسخه", "fuel": "هیبرید/برقی", "gearbox": "تک‌سرعته/هیبریدی", "drive": "جلو/چهارچرخ محرک بسته به نسخه"}, {"name": "MG 3", "country": "چین/انگلستان", "engine": "1.5 و نسخه‌های مختلف", "fuel": "بنزینی/هیبرید بسته به نسل", "gearbox": "دستی/اتوماتیک", "drive": "جلو"}, {"name": "KMC J7", "country": "چین/ایران", "engine": "1.5 توربو", "fuel": "بنزینی توربو", "gearbox": "6 سرعته دوکلاچه", "drive": "جلو"}, {"name": "KMC T8", "country": "چین/ایران", "engine": "2.0 توربو", "fuel": "بنزینی توربو", "gearbox": "6 سرعته دستی", "drive": "چهارچرخ محرک"}];
+const input=document.getElementById("input"),send=document.getElementById("send"),messages=document.getElementById("messages"),historyBox=document.getElementById("history");
+let sessions=JSON.parse(localStorage.getItem("tizbal_sessions_v2")||"[]"), current=JSON.parse(localStorage.getItem("tizbal_current_v2")||"[]");
+
+function save(){localStorage.setItem("tizbal_sessions_v2",JSON.stringify(sessions.slice(-40)));localStorage.setItem("tizbal_current_v2",JSON.stringify(current));}
+function addMessage(t,type,store=true){let e=document.getElementById("empty");if(e)e.remove();let d=document.createElement("div");d.className="msg "+type;d.textContent=t;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;if(store){current.push({text:t,type});save();}}
+function showEmpty(t){messages.innerHTML='<div class="empty" id="empty">'+t+"</div>";}
+function renderHistory(){historyBox.innerHTML="";sessions.slice(-15).reverse().forEach(s=>{let d=document.createElement("div");d.textContent=s.title;d.onclick=()=>load(s.id);historyBox.appendChild(d)})}
+function load(id){let s=sessions.find(x=>x.id===id);if(!s)return;current=s.messages.slice();messages.innerHTML="";current.forEach(m=>addMessage(m.text,m.type,false));save();}
+function norm(s){return s.toLowerCase().replace(/[يى]/g,"ی").replace(/ك/g,"ک").replace(/[۰-۹]/g,c=>"۰۱۲۳۴۵۶۷۸۹".indexOf(c));}
+function calc(s){s=s.replace(/×/g,"*").replace(/÷/g,"/").replace(/٪/g,"%").replace(/[^0-9+\-*/().% ]/g,"").trim();if(!s)return null;try{let v=Function('"use strict";return ('+s.replace(/([0-9.]+)%/g,"($1/100")+')')();return Number.isFinite(v)?"نتیجه: "+v:null}catch(e){return null}}
+
+function findCars(q){
+ let n=norm(q);
+ return CAR_DB.filter(c=>norm(c.name).split(" ").some(x=>x.length>2&&n.includes(x))||n.includes(norm(c.name))||norm(c.name).includes(n)).slice(0,8);
+}
+function carAnswer(q){
+ let found=findCars(q);
+ if(!found.length)return null;
+ if(found.length===1){
+   let c=found[0];
+   return "🚗 "+c.name+"\nکشور: "+c.country+"\nموتور: "+c.engine+"\nسوخت: "+c.fuel+"\nگیربکس: "+c.gearbox+"\nسیستم انتقال نیرو: "+c.drive;
+ }
+ return "این خودروها به جستجوی تو نزدیک‌اند:\n"+found.map((c,i)=>(i+1)+". "+c.name+" — "+c.engine).join("\n");
+}
+
+function reply(text){
+ let n=norm(text);
+
+ // گفت‌وگوی معمولی
+ if(/^(سلام|درود|سلام تیزبال|hello|hi|hey)/.test(n))
+   return "سلام 👋 خوش اومدی! من تیزبال هستم. حالت چطوره؟ چه کاری برات انجام بدم؟";
+ if(n.includes("خوبی")||n.includes("حالت چطوره")||n.includes("چه خبر"))
+   return "ممنون 😄 من خوبم و آماده‌ام کمکت کنم. تو چطوری؟";
+ if(n.includes("ممنون")||n.includes("مرسی")||n.includes("متشکرم"))
+   return "خواهش می‌کنم 🌷";
+ if(n.includes("خداحافظ")||n.includes("فعلا")||n.includes("بای"))
+   return "خداحافظ 👋 هر وقت خواستی برگرد.";
+ if(n.includes("اسمت چیه")||n.includes("اسم تو چیه"))
+   return "من تیزبال هستم ⚡";
+
+ // پرسش‌های عمومی و افراد معروف
+ if(n.includes("ایلان ماسک"))
+   return "ایلان ماسک یک کارآفرین و مدیر فناوری است که به‌خاطر فعالیت در شرکت‌هایی مانند Tesla و SpaceX شناخته می‌شود و در پروژه‌ها و شرکت‌های فناوری دیگری هم فعالیت داشته است.";
+ if(n.includes("آلبرت اینشتین")||n.includes("انیشتین"))
+   return "آلبرت اینشتین فیزیکدان نظری بود که به‌خاطر نظریه نسبیت و نقش مهمش در فیزیک نوین شناخته می‌شود.";
+ if(n.includes("استیو جابز"))
+   return "استیو جابز یکی از بنیان‌گذاران اپل بود و در توسعه و معرفی محصولات مهمی مانند Macintosh، iPod، iPhone و iPad نقش داشت.";
+ if(n.includes("گوگل چیه")||n.includes("گوگل چیست"))
+   return "گوگل یک شرکت فناوری بزرگ است که با موتور جست‌وجوی خود مشهور شد و در حوزه‌هایی مثل نرم‌افزار، سخت‌افزار، تبلیغات و خدمات اینترنتی فعالیت می‌کند.";
+ if(n.includes("هوش مصنوعی چیه")||n.includes("هوش مصنوعی چیست"))
+   return "هوش مصنوعی به روش‌ها و سامانه‌هایی گفته می‌شود که می‌توانند بعضی کارهای مرتبط با هوش انسانی، مثل تشخیص الگو، پردازش زبان و تصمیم‌گیری، را انجام دهند.";
+ if(n.includes("اینترنت چیه")||n.includes("اینترنت چیست"))
+   return "اینترنت یک شبکه بسیار بزرگ از شبکه‌های به‌هم‌پیوسته است که دستگاه‌ها را در سراسر جهان به هم متصل می‌کند و امکان تبادل اطلاعات و استفاده از خدمات مختلف را می‌دهد.";
+ if(n.includes("سن زمین")||n.includes("زمین چند ساله"))
+   return "سن زمین حدود ۴٫۵۴ میلیارد سال برآورد می‌شود.";
+ if(n.includes("پایتخت ایران"))
+   return "پایتخت ایران تهران است.";
+ if(n.includes("پایتخت آمریکا")||n.includes("پایتخت امریکا"))
+   return "پایتخت ایالات متحده آمریکا واشینگتن دی‌سی است.";
+ if(n.includes("بزرگترین کشور")||n.includes("بزرگ ترین کشور"))
+   return "روسیه از نظر مساحت بزرگ‌ترین کشور جهان است.";
+
+ // زمان، تاریخ و محاسبه
+ if(n.includes("ساعت"))
+   return "الان ساعت "+new Date().toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"});
+ if(n.includes("تاریخ"))
+   return "امروز "+new Date().toLocaleDateString("fa-IR");
+ let x=calc(text);if(x)return x;
+
+ // خودرو
+ let ca=carAnswer(text);if(ca)return ca;
+ if(n.includes("ماشین")||n.includes("خودرو"))
+   return "اسم خودرو را بگو؛ مثلاً پژو پارس، دنا، Toyota Corolla یا BMW 3 Series.";
+
+ // لپ‌تاپ و بازی
+ if(n.includes("لپ تاپ")||n.includes("لپتاپ"))
+   return "مدل لپ‌تاپ را بگو تا اطلاعات موجود را بررسی کنم.";
+ if(n.includes("بازی"))
+   return "اسم بازی را بگو؛ مثلاً GTA V، Minecraft یا FIFA تا درباره آن اطلاعات بدهم.";
+
+ if(n.includes("چی کار میکنی")||n.includes("چه کار میکنی"))
+   return "من می‌توانم باهات گفتگو کنم، محاسبه انجام بدهم، اطلاعات خودروها را بررسی کنم و به پرسش‌های عمومی که در دانش محلی‌ام دارم پاسخ بدهم.";
+
+ return "سؤال خوبی بود 🙂 فعلاً برای این سؤال اطلاعات آماده‌ای در نسخه محلی من ندارم. اگر موضوع را ساده‌تر یا با نام دقیق‌تر بگویی، دوباره بررسی می‌کنم.";
+}
+
+function sendMsg(){let t=input.value.trim();if(!t)return;addMessage(t,"user");input.value="";let a=reply(t);setTimeout(()=>{addMessage(a,"bot");let id=current._id||Date.now();current._id=id;let s=sessions.find(x=>x.id===id);if(!s){s={id,title:t,messages:current.slice()};sessions.push(s)}else s.messages=current.slice();save();renderHistory();},100);}
+send.onclick=sendMsg;input.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg()}};
+document.getElementById("newChat").onclick=()=>{if(current.length){let id=current._id||Date.now();let old=sessions.find(x=>x.id===id);if(!old)sessions.push({id,title:(current.find(m=>m.type==="user")||{text:"گفتگو"}).text,messages:current.slice()})}current=[];showEmpty("گفتگوی جدید آماده است 👋");save();renderHistory();input.focus()};
+document.getElementById("clear").onclick=()=>{current=[];showEmpty("گفتگو پاک شد.");save()};
+document.getElementById("time").onclick=()=>{input.value="ساعت چنده؟";input.focus()};
+document.getElementById("calc").onclick=()=>{input.value="25 * 4";input.focus()};
+document.getElementById("cars").onclick=()=>{input.value="پژو پارس";input.focus()};
+document.getElementById("hello").onclick=()=>{input.value="سلام";input.focus()};
+document.getElementById("general").onclick=()=>{input.value="ایلان ماسک کیه؟";input.focus()};
+renderHistory();if(current.length){messages.innerHTML="";current.forEach(m=>addMessage(m.text,m.type,false))}input.focus();
+</script></body></html>
